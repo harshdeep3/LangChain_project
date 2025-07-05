@@ -1,8 +1,6 @@
 langchain
+langchain-core
 langchain-community
 langchainhub
 langchain-ollama
-chromadb
-faiss-cpu
 pypdf
-python-dotenv
