@@ -6,3 +6,7 @@ This script is compares two paper in pdf format. The idea is to pass in the loca
 
 ## Summaises web page
 This file will take in a url using command line arguements and summarise the webpage in basic information. 
+
+### Example command to run 
+After activating the venv for project and going to the correct directory. You can run
+```py .\summaries_web_page.py --webpage https://www.bbc.co.uk/news```

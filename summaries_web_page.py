@@ -1,4 +1,5 @@
 import requests
+import argparse
 from bs4 import BeautifulSoup
 from langchain_core.prompts import PromptTemplate
 from langchain_ollama import ChatOllama
@@ -59,9 +60,16 @@ def summarise_text(text: str, llm) -> str:
 
 
 if __name__ == "__main__":
-
-    url = "https://www.bbc.co.uk/news"  # Replace with your desired article
-    raw_html = fetch_webpage(url)
+    
+    # create argepares
+    parser = argparse.ArgumentParser(description="URL of Webpage to be summarised")
+    
+    # add arguements for parser
+    parser.add_argument('--webpage', type=str, required=True, help="URL of webpage")
+    
+    args = parser.parse_args()
+    
+    raw_html = fetch_webpage(args.webpage)
     cleaned_text = extract_text_from_html(raw_html)
 
     # Init LLM
