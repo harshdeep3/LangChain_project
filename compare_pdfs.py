@@ -1,4 +1,5 @@
 from pathlib import Path
+import argparse
 
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_core.prompts import PromptTemplate
@@ -6,13 +7,19 @@ from langchain_ollama import ChatOllama
 
 if __name__ == "__main__":
     data_file_path = str(Path(__file__).parent / "data")
-
-    file1 = "\\doc_1.pdf"
-    file2 = "\\doc_2.pdf"
+    
+    # create argepares
+    parser = argparse.ArgumentParser(description="File paths to document, which will be comapred")
+    
+    # add arguements for parser
+    parser.add_argument('--doc1', type=str, required=True, help="File path to document 1")
+    parser.add_argument('--doc2', type=str, required=True, help="File path to document 2")
+    
+    args = parser.parse_args()
 
     # load pdf file data
-    loader_file1 = PyPDFLoader(data_file_path + file1)
-    loader_file2 = PyPDFLoader(data_file_path + file2)
+    loader_file1 = PyPDFLoader(args.doc1)
+    loader_file2 = PyPDFLoader(args.doc2)
     doc1 = loader_file1.load()
     doc2 = loader_file2.load()
 
@@ -86,4 +93,4 @@ if __name__ == "__main__":
             "document_2": structured_data_doc2,
         }
     )
-    print("\n[SIMPLIFIED SUMMARY]\n", simplified_summary)
+    print("\n[SIMPLIFIED SUMMARY]\n", simplified_summary.content)
