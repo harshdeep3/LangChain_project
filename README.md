@@ -15,3 +15,7 @@ This file will take in a url using command line arguements and summarise the web
 ### Example command to run 
 After activating the venv for project and going to the correct directory. You can run
 ```py .\summaries_web_page.py --webpage https://www.bbc.co.uk/news```
+
+## Create Resturant Menu
+This file will create a resturant name and menu based on the provided cusine.
+```py .\resturant_project.py --cuisine indian```
