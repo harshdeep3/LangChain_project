@@ -1,5 +1,5 @@
-from pathlib import Path
 import argparse
+from pathlib import Path
 
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_core.prompts import PromptTemplate
@@ -9,7 +9,7 @@ from langchain_ollama import ChatOllama
 def extract_structured_data(model, document: str) -> dict:
     """
     Extract structured data from a research paper document.
-    Args:   
+    Args:
         document (str): The content of the research paper document.
     Returns:
         dict: A dictionary containing structured fields like title, authors, abstract, methods, results,
@@ -39,9 +39,13 @@ def extract_structured_data(model, document: str) -> dict:
         }}
         """
     )
-    
+
     extract_chain = extract_template | model
-    return extract_chain.invoke({"document": document})
+
+    # First LLM Chain - extract structured data from the document
+    # then check if the output is useful and in the correct format
+    return check_return_info(model, extract_chain.invoke({"document": document}))
+
 
 def check_return_info(model, llm_output: str) -> dict:
     """
@@ -76,9 +80,10 @@ def check_return_info(model, llm_output: str) -> dict:
         }}
         """
     )
-    
+
     check_chain = check_template | model
     return check_chain.invoke({"llm_output": llm_output})
+
 
 def compare_doc(model, structured_data_doc1: dict, structured_data_doc2: dict) -> str:
     """
@@ -98,28 +103,28 @@ def compare_doc(model, structured_data_doc1: dict, structured_data_doc2: dict) -
         {document_2}
         """
     )
-    
+
     summarize_chain = summarize_template | model
     simplified_summary = summarize_chain.invoke(
         {
             "document_1": structured_data_doc1,
             "document_2": structured_data_doc2,
         }
-    ) 
-    
+    )
+
     return simplified_summary.content
 
 
 if __name__ == "__main__":
     data_file_path = str(Path(__file__).parent / "data")
-    
+
     # create argepares
     parser = argparse.ArgumentParser(description="File paths to document, which will be comapred")
-    
+
     # add arguements for parser
-    parser.add_argument('--doc1', type=str, required=True, help="File path to document 1")
-    parser.add_argument('--doc2', type=str, required=True, help="File path to document 2")
-    
+    parser.add_argument("--doc1", type=str, required=True, help="File path to document 1")
+    parser.add_argument("--doc2", type=str, required=True, help="File path to document 2")
+
     args = parser.parse_args()
 
     # load pdf file data
@@ -134,11 +139,8 @@ if __name__ == "__main__":
     # get structured data from both documents
     structured_data_doc1 = extract_structured_data(model, doc1)
     structured_data_doc2 = extract_structured_data(model, doc2)
-    
-    # check if the structured data is in the correct format and correct it if necessary
-    structured_data_doc1 = check_return_info(model, structured_data_doc1.content)
-    structured_data_doc2 = check_return_info(model, structured_data_doc2.content)
-    
+
+    # compare the structured data
     compared_info = compare_doc(model, structured_data_doc1, structured_data_doc2)
-    
+
     print("\n[SIMPLIFIED SUMMARY]\n", compared_info)
