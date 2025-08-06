@@ -1,17 +1,14 @@
 import argparse
 from pathlib import Path
 
-from langchain_community.document_loaders import PyPDFLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_core.prompts import PromptTemplate
-from langchain_ollama import ChatOllama
-from langchain_community.vectorstores import FAISS
-from langchain_huggingface import HuggingFaceEmbeddings
-
-from langchain_core.documents import Document
-from langchain_core.runnables import Runnable
 from langchain.chains.retrieval_qa.base import RetrievalQA
-
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.document_loaders import PyPDFLoader
+from langchain_community.vectorstores import FAISS
+from langchain_core.documents import Document
+from langchain_core.prompts import PromptTemplate
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_ollama import ChatOllama
 from youtube_transcript_api import YouTubeTranscriptApi
 
 
@@ -25,11 +22,10 @@ def load_pdf(path):
 
 # 📺 Load YouTube Transcript
 def load_youtube_transcript(api: YouTubeTranscriptApi, video_id: str):
-    
+
     transcript = api.fetch(video_id)
     combined_text = " ".join([snippet.text for snippet in transcript.snippets])
     return [Document(page_content=combined_text, metadata={"source": f"https://youtube.com/watch?v={video_id}"})]
-
 
 
 # 📚 Build Vectorstore (FAISS)
@@ -44,18 +40,17 @@ def build_qa_chain(vectorstore):
 
     llm = ChatOllama(model="llama3.1")
 
-    prompt = PromptTemplate.from_template("""
+    prompt = PromptTemplate.from_template(
+        """
     Use the following context to answer the question:
     {context}
 
     Question: {question}
-    """)
+    """
+    )
 
     qa_chain = RetrievalQA.from_chain_type(
-        llm=llm,
-        retriever=retriever,
-        chain_type="stuff",
-        chain_type_kwargs={"prompt": prompt}
+        llm=llm, retriever=retriever, chain_type="stuff", chain_type_kwargs={"prompt": prompt}
     )
 
     return qa_chain
@@ -77,7 +72,7 @@ if __name__ == "__main__":
     # add arguements for parser
     parser.add_argument("--doc", type=str, required=True, help="File path to document")
     parser.add_argument("--video", type=str, required=True, help="Video id for YouTube transcript")
-    
+
     args = parser.parse_args()
 
     pdf_text = load_pdf(args.doc)
@@ -86,13 +81,13 @@ if __name__ == "__main__":
     youtube_transcript = load_youtube_transcript(api, args.video)  # Example YouTube video ID
 
     all_docs = pdf_text + youtube_transcript
-    
+
     vectorstore = build_vectorstore(all_docs)
     qa_chain = build_qa_chain(vectorstore)
-    
+
     # Ask a question
     question = "Summarise the key ideas from the video and paper."
     result = ask_question(qa_chain, question)
 
-    print("\n question:\n", result['query'])
-    print("\n📌 Answer:\n", result['result'])
+    print("\n question:\n", result["query"])
+    print("\n📌 Answer:\n", result["result"])
