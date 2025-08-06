@@ -3,5 +3,10 @@ langchain-core
 langchain-community
 langchainhub
 langchain-ollama
+langchain-huggingface
 pypdf
 beautifulsoup4
+faiss-cpu
+chromadb
+youtube-transcript-api
+sentence-transformers
