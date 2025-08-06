@@ -116,7 +116,6 @@ def compare_doc(model, structured_data_doc1: dict, structured_data_doc2: dict) -
 
 
 if __name__ == "__main__":
-    data_file_path = str(Path(__file__).parent / "data")
 
     # create argepares
     parser = argparse.ArgumentParser(description="File paths to document, which will be comapred")
