@@ -16,6 +16,9 @@ from youtube_transcript_api import YouTubeTranscriptApi
 def load_pdf(path):
     loader = PyPDFLoader(path)
     pages = loader.load()
+    
+    # Chunking helps efficient embedding and retrieval 
+    # because LLMs and vector stores work better with smaller text pieces.
     splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=100)
     return splitter.split_documents(pages)
 
@@ -50,6 +53,7 @@ def build_qa_chain(vectorstore):
     )
 
     qa_chain = RetrievalQA.from_chain_type(
+        # chain_type options ->"stuff", "map_reduce", "refine", "map_rerank"
         llm=llm, retriever=retriever, chain_type="stuff", chain_type_kwargs={"prompt": prompt}
     )
 
